@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: plot-twist-engine
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health

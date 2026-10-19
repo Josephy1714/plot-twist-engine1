@@ -1,0 +1,12 @@
+{
+  "name": "plot-twist-engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A room-based browser arcade strategy game prototype",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
