@@ -1,4 +1,4 @@
-const { handle, tick } = require('../server');
+const { handle, tick } = require('../lib/game-engine.cjs');
 
 const ROOM_KEY = 'plot-twist-engine:rooms';
 const LOCK_KEY = 'plot-twist-engine:lock';
