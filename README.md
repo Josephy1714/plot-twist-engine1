@@ -58,19 +58,31 @@ node server.js
 
 Open [http://localhost:4173](http://localhost:4173). To play from other devices on the same Wi-Fi, use the host computer's LAN address with port `4173`, for example `http://192.168.1.20:4173`. The hosting computer must remain on and the server process must stay running.
 
+Run the built-in smoke tests with:
+
+```sh
+npm test
+```
+
+The tests cover room creation, joining, starting a match, voting, the first movement action, and safe reporting of missing Redis configuration.
+
 ## Deploy to Vercel
 
 [`vercel.json`](vercel.json) places the API Function in Singapore (`sin1`) near the recommended Redis region. Static files are served by Vercel, while [`api/[...path].js`](api/%5B...path%5D.js) handles the room API. Room state is shared through the Upstash Redis REST API, so separate Function instances can read and update the same rooms.
 
-1. Import this repository into your Vercel account. The repository is private, so grant Vercel access to `Josephy1714/plot-twist-engine` when prompted.
+1. Import this repository (`Josephy1714/plot-twist-engine1`) into Vercel.
 2. Create an Upstash Redis database through the Vercel Marketplace. Choose Singapore (`ap-southeast-1`) when available so the database is close to the Function region.
-3. Confirm that the Vercel project has these environment variables in Preview and Production:
+3. Confirm the Vercel project has these environment variables in **Preview and Production**:
    - `UPSTASH_REDIS_REST_URL`
    - `UPSTASH_REDIS_REST_TOKEN`
 
    The Upstash integration can add them for you. If adding them manually, use the REST URL and token from the Upstash database console. Never commit these values to the repository.
 4. Deploy the project and wait for the build to finish. Open the assigned `vercel.app` URL, create a room, then join from a second browser or device.
 5. Share the URL and room code with other pilots. Rematches use the same room.
+
+### Verify a Vercel deployment
+
+Open `/api/health` on the deployed site. A healthy deployment returns JSON with `"ok": true` and both `runtime` and `redis` checks set to `"ok"`. If Redis is missing or unreachable, the endpoint returns HTTP 503 with a safe diagnostic message; it never returns the Redis URL or token.
 
 Vercel serves the static game without a sleeping web server. Functions can still cold-start after idle periods. Redis is required for rooms to be shared across Function invocations. The prototype keeps room state in one Redis key and expires that key after eight hours without a room-changing request. Keep the Vercel Function and Redis database in the same region for responsive polling. Check the plans and usage limits for both Vercel and Upstash before deployment.
 
@@ -79,8 +91,9 @@ Vercel serves the static game without a sleeping web server. Functions can still
 - `index.html` contains the responsive interface and browser-side game client.
 - `server.js` contains the shared game rules and a local Node server for same-network playtests.
 - `api/[...path].js` exposes the game API as a Vercel Function and uses Upstash Redis for shared room state.
+- `api/health.js` checks the function runtime and Redis connectivity without exposing credentials.
 - `vercel.json` places the Function in Singapore.
-- `package.json` defines the local Node start command; the game has no Node package dependencies.
+- `package.json` defines the local start and smoke-test commands; the game has no third-party Node package dependencies.
 
 Locally, room state stays in memory and rooms expire after six hours while inactive. On Vercel, room state is shared through Redis and room-changing requests refresh an eight-hour storage TTL. There is no account identity, persistent global leaderboard, daily challenge, or anti-cheat system. The scoreboard ranks players only within the current room. Do not use this prototype for sensitive information or high-stakes competition.
 
