@@ -4,7 +4,8 @@
   "private": true,
   "description": "A room-based browser arcade strategy game prototype",
   "scripts": {
-    "start": "node local-server.cjs",
+    "start": "node server.js",
+    "dev": "node local-server.cjs",
     "test": "node test/smoke.cjs"
   },
   "engines": {
